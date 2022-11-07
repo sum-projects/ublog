@@ -19,7 +19,7 @@ type PostRespoitory interface {
 	Get(uuid.UUID) (*post.Post, uerror.Error)
 	GetAll() (post.Posts, uerror.Error)
 	Create(post.Post) (*post.Post, uerror.Error)
-	Update(post.Post, uuid.UUID) uerror.Error
+	Update(uuid.UUID, post.Post) (*post.Post, uerror.Error)
 	Delete(uuid.UUID) uerror.Error
 }
 
@@ -83,13 +83,34 @@ func (repo *postRepository) Create(p post.Post) (*post.Post, uerror.Error) {
 		return nil, uerror.NewInternalServerError("error when trying to insert post", err)
 	}
 
-	return &p, nil
+	return repo.Get(p.ID)
 }
 
-func (repo *postRepository) Update(p post.Post, id uuid.UUID) uerror.Error {
-	return nil
+func (repo *postRepository) Update(id uuid.UUID, p post.Post) (*post.Post, uerror.Error) {
+	stmt, err := mysql.Client.Prepare(queryUpdatePost)
+	if err != nil {
+		return nil, uerror.NewInternalServerError("error when trying to prepare update post statement", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(p.Title, p.Content, id.String())
+	if err != nil {
+		return nil, uerror.NewInternalServerError("error when trying to update post", err)
+	}
+
+	return repo.Get(id)
 }
 
 func (repo *postRepository) Delete(id uuid.UUID) uerror.Error {
+	stmt, err := mysql.Client.Prepare(queryDeletePost)
+	if err != nil {
+		return uerror.NewInternalServerError("error when trying to prepare delete post statement", err)
+	}
+	defer stmt.Close()
+
+	if _, err = stmt.Exec(id.String()); err != nil {
+		return uerror.NewInternalServerError("error when tying to delete post", err)
+	}
+
 	return nil
 }
