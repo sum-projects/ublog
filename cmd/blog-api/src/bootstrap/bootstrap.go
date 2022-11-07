@@ -35,7 +35,7 @@ func Run() {
 				os.Exit(1)
 			}
 
-			srv.Start(stopper)
+			srv.Start()
 		},
 	}
 

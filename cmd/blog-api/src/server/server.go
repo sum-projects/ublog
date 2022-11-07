@@ -1,10 +1,12 @@
 package server
 
 import (
-	"context"
 	"errors"
-	"log"
-	"net/http"
+	"github.com/gin-gonic/gin"
+	"github.com/sum-project/ublog/cmd/blog-api/src/config/router"
+	"github.com/sum-project/ublog/cmd/blog-api/src/controller"
+	"github.com/sum-project/ublog/cmd/blog-api/src/repository/post_repository"
+	"github.com/sum-project/ublog/cmd/blog-api/src/service/post_service"
 	"time"
 )
 
@@ -26,22 +28,11 @@ func NewApiServer(addr string) (*ApiServer, error) {
 	}, nil
 }
 
-func (s *ApiServer) Start(stop <-chan struct{}) error {
-	srv := &http.Server{
-		Addr: s.addr,
-	}
-
-	go func() {
-		log.Printf("starting server on addr: %s", s.addr)
-		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-			log.Printf("listen: %s\n", err)
-		}
-	}()
-
-	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), defaultStopTimeout)
-	defer cancel()
-
-	log.Printf("stopping server timeout: %d", defaultStopTimeout)
-	return srv.Shutdown(ctx)
+func (s *ApiServer) Start() error {
+	engine := gin.Default()
+	repository := post_repository.NewPostRepository()
+	service := post_service.NewPostService(repository)
+	userController := controller.NewPostEndpoint(service)
+	router.MapRouter(engine, userController)
+	return engine.Run(s.addr)
 }
