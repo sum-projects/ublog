@@ -7,15 +7,21 @@ services:
     volumes:
       - .:/app
     environment:
-      API_SERVER_ADDR: ":3000"
-      DATABASE_URL: postgres://local-dev@db/api?sslmode=disable
+      mysql_users_username: 'root'
+      mysql_users_password: 'root'
+      mysql_users_host: '127.0.0.1:3306'
+      mysql_users_schema: 'db'
     ports:
       - "3000:3000"
     links:
       - blog-api-db
   blog-api-db:
-    image: postgres:13-alpine
+    image: mysql:8.0
+    restart: always
     environment:
-      POSTGRES_DB: api
-      POSTGRES_USER: local-dev
-      POSTGRES_HOST_AUTH_METHOD: trust
+      MYSQL_DATABASE: 'db'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'

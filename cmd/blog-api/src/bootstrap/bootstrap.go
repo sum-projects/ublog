@@ -5,8 +5,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/sum-project/ublog/cmd/blog-api/src/server"
 	"os"
-	"os/signal"
-	"syscall"
 )
 
 const (
@@ -17,16 +15,6 @@ func Run() {
 	rootCmd := &cobra.Command{
 		Use: "Start",
 		Run: func(cmd *cobra.Command, args []string) {
-			done := make(chan os.Signal, 1)
-			signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-			stopper := make(chan struct{})
-
-			go func() {
-				<-done
-				close(stopper)
-			}()
-
 			addr, _ := cmd.Flags().GetString(flagAddress)
 
 			srv, err := server.NewApiServer(addr)

@@ -7,9 +7,9 @@ import (
 
 func MapRouter(router *gin.Engine, endpoint controller.PostEndpoint) {
 	v1 := router.Group("/api/v1")
-	v1.GET("/user", endpoint.Get)
-	v1.GET("/users", endpoint.GetAll)
-	v1.POST("/user", endpoint.Add)
-	v1.PUT("/user", endpoint.Update)
-	v1.DELETE("/user", endpoint.Delete)
+	v1.GET("/post", endpoint.Get)
+	v1.GET("/posts", endpoint.GetAll)
+	v1.POST("/post", endpoint.Add)
+	v1.PUT("/post", endpoint.Update)
+	v1.DELETE("/post", endpoint.Delete)
 }

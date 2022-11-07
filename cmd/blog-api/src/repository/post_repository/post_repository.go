@@ -2,7 +2,7 @@ package post_repository
 
 import (
 	"github.com/google/uuid"
-	"github.com/sum-project/ublog/cmd/blog-api/src/clients/postgres"
+	"github.com/sum-project/ublog/cmd/blog-api/src/clients/mysql"
 	"github.com/sum-project/ublog/cmd/blog-api/src/domain/post"
 	"github.com/sum-project/ublog/pkg/uerror"
 )
@@ -30,7 +30,7 @@ func NewPostRepository() PostRespoitory {
 }
 
 func (repo *postRepository) Get(id uuid.UUID) (*post.Post, uerror.Error) {
-	stmt, err := postgres.Client.Prepare(queryGetPost)
+	stmt, err := mysql.Client.Prepare(queryGetPost)
 	if err != nil {
 		return nil, uerror.NewInternalServerError("error when trying to prepare get post statement", err)
 	}
@@ -47,7 +47,7 @@ func (repo *postRepository) Get(id uuid.UUID) (*post.Post, uerror.Error) {
 }
 
 func (repo *postRepository) GetAll() (post.Posts, uerror.Error) {
-	stmt, err := postgres.Client.Prepare(queryGetAllPost)
+	stmt, err := mysql.Client.Prepare(queryGetAllPost)
 	if err != nil {
 		return nil, uerror.NewInternalServerError("error when trying to prepare get posts statement", err)
 	}
@@ -72,7 +72,7 @@ func (repo *postRepository) GetAll() (post.Posts, uerror.Error) {
 }
 
 func (repo *postRepository) Create(p post.Post) (*post.Post, uerror.Error) {
-	stmt, err := postgres.Client.Prepare(queryInsertPost)
+	stmt, err := mysql.Client.Prepare(queryInsertPost)
 	if err != nil {
 		return nil, uerror.NewInternalServerError("error when trying to prepare insert post statement", err)
 	}
