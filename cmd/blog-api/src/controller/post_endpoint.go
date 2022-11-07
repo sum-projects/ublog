@@ -2,7 +2,9 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/sum-project/ublog/cmd/blog-api/src/domain/post"
 	"github.com/sum-project/ublog/cmd/blog-api/src/service/post_service"
+	"github.com/sum-project/ublog/pkg/uerror"
 	"net/http"
 )
 
@@ -31,7 +33,18 @@ func (endpoint *postEndpoint) GetAll(c *gin.Context) {
 	c.JSON(http.StatusNotImplemented, "Implement me!")
 }
 func (endpoint *postEndpoint) Add(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, "Implement me!")
+	var p post.Post
+	if err := c.ShouldBindJSON(&p); err != nil {
+		apiErr := uerror.NewBadRequestError("invalid json body")
+		c.JSON(apiErr.Status(), apiErr)
+	}
+
+	newPost, err := endpoint.postService.AddPost(p)
+	if err != nil {
+		c.JSON(err.Status(), err)
+	}
+
+	c.JSON(http.StatusCreated, newPost)
 }
 func (endpoint *postEndpoint) Update(c *gin.Context) {
 	c.JSON(http.StatusNotImplemented, "Implement me!")

@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	queryGetPost    = "SELECT id, title, content, created_at, updated_at, deleted_at FROM users WHERE id=?;"
-	queryGetAllPost = "SELECT id, title, content, created_at, updated_at, deleted_at FROM users;"
-	queryInsertPost = "INSERT INTO users(title, content) VALUES(?, ?);"
-	queryUpdatePost = "UPDATE users SET title=?, content=? WHERE id=?;"
-	queryDeletePost = "UPDATE users SET deleted_at=NOW() WHERE id=?;"
+	queryGetPost    = "SELECT id, title, content, created_at, updated_at, deleted_at FROM posts WHERE id=?;"
+	queryGetAllPost = "SELECT id, title, content, created_at, updated_at, deleted_at FROM posts;"
+	queryInsertPost = "INSERT INTO posts(id, title, content) VALUES(?, ?, ?);"
+	queryUpdatePost = "UPDATE posts SET title=?, content=? WHERE id=?;"
+	queryDeletePost = "UPDATE posts SET deleted_at=NOW() WHERE id=?;"
 )
 
 type PostRespoitory interface {
@@ -78,14 +78,9 @@ func (repo *postRepository) Create(p post.Post) (*post.Post, uerror.Error) {
 	}
 	defer stmt.Close()
 
-	row := stmt.QueryRow(p.Title, p.Content)
-	if err = row.Scan(&p.ID); err != nil {
+	p.ID = uuid.New()
+	if _, err = stmt.Exec(p.ID.String(), p.Title, p.Content); err != nil {
 		return nil, uerror.NewInternalServerError("error when trying to insert post", err)
-	}
-
-	var id uuid.UUID
-	if err = row.Scan(&id); err != nil {
-		return nil, uerror.NewInternalServerError("error when trying to get post uuid", err)
 	}
 
 	return &p, nil

@@ -7,9 +7,9 @@ services:
     volumes:
       - .:/app
     environment:
-      mysql_users_username: 'root'
-      mysql_users_password: 'root'
-      mysql_users_host: '127.0.0.1:3306'
+      mysql_users_username: 'user'
+      mysql_users_password: 'user'
+      mysql_users_host: 'db'
       mysql_users_schema: 'db'
     ports:
       - "3000:3000"
@@ -17,9 +17,12 @@ services:
       - blog-api-db
   blog-api-db:
     image: mysql:8.0
+    container_name: db
     restart: always
     environment:
-      MYSQL_DATABASE: 'db'
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
       MYSQL_ROOT_PASSWORD: 'root'
     ports:
       - '3306:3306'

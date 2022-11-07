@@ -57,6 +57,14 @@ func NewInternalServerError(message string, err error) Error {
 	return result
 }
 
+func NewBadRequestError(message string) Error {
+	return &customError{
+		ErrMessage: message,
+		ErrStatus:  http.StatusBadRequest,
+		ErrError:   "bad_request",
+	}
+}
+
 func NewNotFoundError(message string) Error {
 	return &customError{
 		ErrMessage: message,
